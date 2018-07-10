@@ -28,7 +28,7 @@ func(this *TcpProxy) Write(conn net.Conn,data interface{}) (int,error){
 // 接收消息
 func(this *TcpProxy) Read(conn net.Conn) (chan []byte,error){
 	var err error
-	var b []byte=make([]byte,0)
+	var b []byte=make([]byte,128)
 	var i int
 	if i,err=conn.Read(b);err==nil{
 		b=b[:i]

@@ -10,6 +10,14 @@ type Protocol interface{
 	// 解包
 	Unpack(buffer []byte,readChan chan []byte)
 }
+func CreatePro(t string)(p Protocol){
+	switch(t){
+	default:
+		p=new(CustomPro)
+		break
+	}
+	return
+}
 
 type CustomPro struct{
 
@@ -27,9 +35,13 @@ func(this *CustomPro) Unpack(buffer []byte,readChan chan []byte){
 		for i,c:=range chars{
 			if c==proSplitChar{
 				readChan<-buffer[startIndex:i]
-				startIndex=+1
+				startIndex=i+1
 			}
 		}
-		readChan<-[]byte{}
+		if startIndex >= len(buffer){
+			readChan<-[]byte{}
+		}else{
+			readChan<-buffer[startIndex:]
+		}
 	}()
 }

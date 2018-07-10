@@ -10,3 +10,13 @@ type Pool interface{
 	Clear()
 	Count() int
 }
+func CreatePool(t string) (p Pool){
+	switch(t){
+	default:
+		temp:=new(PoolMemory)
+		temp.Init(60)
+		p=temp
+		break
+	}
+	return
+}

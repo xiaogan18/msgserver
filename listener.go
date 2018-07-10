@@ -7,13 +7,14 @@ import(
 type Lister struct{
 	net.Listener
 	pool pool.Pool
-	Filter Filter
-	//有新连接时发生
-	OnAcceptCallback func()
-	//身份验证
-	OnAuthentication func(string) (string,error)
 	//tcp代理类
 	tcpProxy *TcpProxy
+	//有客户端上线时发生
+	onNewOnline func(string)
+	// 过滤器
+	Filter Filter
+	//身份验证
+	OnAuthentication func(string) (string,error)
 }
 func(this *Lister) Init(pool pool.Pool,proxy *TcpProxy) error{
 	this.pool=pool
@@ -26,19 +27,19 @@ func(this *Lister) Listen(address string) error{
 	if(err!=nil){
 		return err
 	}
-
+	fmt.Printf("listen address %s ...",address)
 	for{
 		conn,err:=lster.Accept()
 		if(err==nil){
 			go func(){
-				if(this.OnAcceptCallback!=nil){
-					this.OnAcceptCallback()
-				}
 				this.handler(conn)
 			}()
 		}
 	}
 	return nil
+}
+func(this *Lister) OnlineCount() int{
+	return this.pool.Count()
 }
 
 func (this *Lister)handler(conn net.Conn){
@@ -69,7 +70,11 @@ func (this *Lister)handler(conn net.Conn){
 		}
 	}
 	if connID==""{
-		connID=fmt.Sprintf("conn%d",this.pool.Count()+1)
+		connID=fmt.Sprintf("conn%s",conn.RemoteAddr().String())
+	}
+	// 客户端上线触发
+	if this.onNewOnline!=nil{
+		this.onNewOnline(connID)
 	}
 	this.pool.Put(connID,conn)
 }
