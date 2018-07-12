@@ -6,7 +6,7 @@ import(
 type Pool interface{
 	Put(id string, conn net.Conn) error
 	Get(id string) (net.Conn,error)
-	Foreach(callback func(net.Conn))
+	Foreach(callback func(string))
 	Clear()
 	Count() int
 }

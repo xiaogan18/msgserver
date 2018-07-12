@@ -2,6 +2,7 @@ package persistence
 import(
 	"sync"
 	"errors"
+	"time"
 )
 type MemoryContainer struct{
 	_msg_lock sync.Mutex
@@ -18,7 +19,7 @@ var(
 func(this *MemoryContainer) Get(id string) (*OfflineMsg,error){
 	this._msg_lock.Lock()
 	defer func(){
-		this._msg_lock.Lock()
+		this._msg_lock.Unlock()
 	}()
 	if v,ok:= this.msgMap[id];ok{
 		delete(this.msgMap,id)
@@ -62,4 +63,27 @@ func (this *MemoryContainer)Put(msg *OfflineMsg){
 		this.userMsgMap[user]=[]string{msg.MsgId}
 	}
 	this.msgMap[msg.MsgId]=msg
+}
+// 清理过期消息
+// param interval 间隔（毫秒）
+func (this *MemoryContainer) gc(interval int){
+	go func(interval int){
+		for{
+			invalid:=make([]string,0)
+			this._msg_lock.Lock()
+			for key:=range this.msgMap{
+				if this.msgMap[key].KeepLiveTime.Before(time.Now()){
+					invalid= append(invalid,key)
+				}
+			}
+			if len(invalid) > 0{
+				for _,k:=range invalid{
+					delete(this.msgMap,k)
+				}
+			}
+			this._msg_lock.Unlock()
+			time.Sleep(time.Duration(interval) * time.Millisecond)
+		}
+	}(interval)
+
 }

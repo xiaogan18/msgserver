@@ -5,10 +5,10 @@ import(
 	"time"
 )
 // 开始自动清理无效连接
-func beginConnGC(connList *map[string]net.Conn,interval int64){
+func (this *PoolMemory)beginConnGC(connList map[string]net.Conn,interval int64){
 	go func(){
 		for{
-			list:=*connList
+			list:=connList
 			downConns:=make([]string,0)
 			for key:=range list{
 				conn:=list[key]
@@ -18,12 +18,12 @@ func beginConnGC(connList *map[string]net.Conn,interval int64){
 			}
 			//移除无效连接conn
 			//fmt.Println("begin conn gc")
-			_lock.Lock()
+			this._lock.Lock()
 			for _,k:=range downConns{
 			//	fmt.Println("remove a conn "+k)
 				delete(list,k)
 			}
-			_lock.Unlock()
+			this._lock.Unlock()
 			time.Sleep(time.Duration(interval) * time.Millisecond)  //休眠
 		}
 	}()

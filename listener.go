@@ -16,10 +16,12 @@ type Lister struct{
 	//身份验证
 	OnAuthentication func(string) (string,error)
 }
-func(this *Lister) Init(pool pool.Pool,proxy *TcpProxy) error{
+// 初始化一个监听器
+func NewListener(pool pool.Pool,proxy *TcpProxy) *Lister{
+	this:=&Lister{}
 	this.pool=pool
 	this.tcpProxy=proxy
-	return nil
+	return this
 }
 // 开启监听（阻塞）
 func(this *Lister) Listen(address string) error{
@@ -27,7 +29,7 @@ func(this *Lister) Listen(address string) error{
 	if(err!=nil){
 		return err
 	}
-	fmt.Printf("listen address %s ...",address)
+	fmt.Printf("listen address %s ...\n",address)
 	for{
 		conn,err:=lster.Accept()
 		if(err==nil){
@@ -36,7 +38,6 @@ func(this *Lister) Listen(address string) error{
 			}()
 		}
 	}
-	return nil
 }
 func(this *Lister) OnlineCount() int{
 	return this.pool.Count()

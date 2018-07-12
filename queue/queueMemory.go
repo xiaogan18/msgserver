@@ -6,7 +6,7 @@ import(
 )
 var(
 	_lock=new (sync.Mutex)    //互斥锁
-	Error_QueueIsClear=errors.New("queue is already clear")   //队列为空
+	Error_QueueIsEmpty=errors.New("queue is already empty")   //队列为空
 )
   
 type QueueMemory struct{
@@ -26,7 +26,7 @@ func(this *QueueMemory) Enqueue(msg *Message) error{
 //出队
 func(this *QueueMemory) Dequeue() (*Message,error){
 	if this.queue==nil || this.queue.Len()==0{
-		return nil,Error_QueueIsClear
+		return nil,Error_QueueIsEmpty
 	}
 	var msg *Message
 	//判断队列类型
@@ -39,4 +39,10 @@ func(this *QueueMemory) Dequeue() (*Message,error){
 		break
 	}
 	return msg,nil
+}
+func(this *QueueMemory) Count() int{
+	if this.queue==nil{
+		return 0
+	}
+	return this.queue.Len()
 }

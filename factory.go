@@ -6,11 +6,11 @@ import(
 	"msgserver/queue"
 )
 
-func NewDefaultServer() (sder *Sender,lster *Lister,err error){
+func NewDefaultServer() (sder *SenderScheduler,lster *Lister,err error){
 	return NewServer("default","default","default","default",false)
 }
 
-func NewServer(poolType,queueType,serializer,protocolType string,OnSSL bool) (sder *Sender,lster *Lister,err error){
+func NewServer(poolType,queueType,serializer,protocolType string,OnSSL bool) (sder *SenderScheduler,lster *Lister,err error){
 	defer func(){
 		if e:=recover();e!=nil{
 			sder=nil
@@ -27,11 +27,9 @@ func NewServer(poolType,queueType,serializer,protocolType string,OnSSL bool) (sd
 		IsOnSSL:OnSSL,  //是否开启SSL
 	}
 	//初始化监听器
-	lster=new(Lister)
-	lster.Init(pl,proxy)
+	lster=NewListener(pl,proxy)
 	//初始化消息发送器
-	sder=new(Sender)
-	sder.Init(pl,qu,proxy)
+	sder=NewSender(pl,qu,proxy)
 	//设置上线消息触发
 	lster.onNewOnline=sder.UpOnline
 	return

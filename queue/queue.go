@@ -5,6 +5,8 @@ type Queue interface{
 	Enqueue(msg *Message) error
 	// 出队
 	Dequeue() (*Message,error)
+	// 消息总数
+	Count() int
 }
 
 func CreateQueue(t string) (q Queue){
