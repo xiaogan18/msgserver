@@ -15,11 +15,12 @@ import(
 	"strings"
 	"net"
 	"errors"
+	"msgserver/persistence"
 )
 type testFilter struct{
 }
 func (this testFilter) OnFilter(conn net.Conn) bool{
-	fmt.Println("filter return true")
+	fmt.Println(conn.RemoteAddr().String())
 	return true
 }
 func main(){
@@ -43,7 +44,16 @@ func main(){
 	go func(){
 		lster.Listen("127.0.0.1:3366")
 	}()
-	
+	// 设置离线消息容器
+	sdr.Container=persistence.CreateMsgContainer("default")
+	// 消息发送处理最大并行数设置
+	sdr.MaxParallel=10
+	//最小并行数设置
+	sdr.MinParallel=1
+	//队列中消息堆积阈值设置
+	sdr.QueueBufferLen=1000
+	// 开始sender
+	sdr.BeginSender()
 	for{
 		// 从标准输入读取字符串，以\n为分割
 		text, err := bufio.NewReader(os.Stdin).ReadString('\n')
