@@ -34,7 +34,15 @@ func main(){
 	}
 	//开启一个协程 监听主机3366端口
 	go func(){
-		lster.Listen("127.0.0.1:3366")
+		lster.Listen("192.168.98.32:3366")
+	}()
+	// 开启协程 监听主机3365端口
+	go func(){
+		apier:=msgserver.Api{
+			Sender:&sdr.Sender,
+		}
+		// 开启http api
+		apier.Listen("127.0.0.1:3365","/msg/sender")
 	}()
 	// 设置离线消息容器
 	sdr.Container=persistence.CreateMsgContainer("default")

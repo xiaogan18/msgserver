@@ -4,7 +4,7 @@ import(
 	"fmt"
 	"msgserver/pool"
 )
-type Lister struct{
+type Listener struct{
 	net.Listener
 	pool pool.Pool
 	//tcp代理类
@@ -17,14 +17,14 @@ type Lister struct{
 	OnAuthentication func(string) (string,error)
 }
 // 初始化一个监听器
-func NewListener(pool pool.Pool,proxy *TcpProxy) *Lister{
-	this:=&Lister{}
+func NewListener(pool pool.Pool,proxy *TcpProxy) *Listener{
+	this:=&Listener{}
 	this.pool=pool
 	this.tcpProxy=proxy
 	return this
 }
 // 开启监听（阻塞）
-func(this *Lister) Listen(address string) error{
+func(this *Listener) Listen(address string) error{
 	lster,err:=net.Listen("tcp",address)
 	if(err!=nil){
 		return err
@@ -39,11 +39,11 @@ func(this *Lister) Listen(address string) error{
 		}
 	}
 }
-func(this *Lister) OnlineCount() int{
+func(this *Listener) OnlineCount() int{
 	return this.pool.Count()
 }
 
-func (this *Lister)handler(conn net.Conn){
+func (this *Listener)handler(conn net.Conn){
 	//过滤器过滤连接
 	if(this.Filter!=nil){
 		if b:=this.Filter.OnFilter(conn);!b{
@@ -79,7 +79,7 @@ func (this *Lister)handler(conn net.Conn){
 	}
 	this.pool.Put(connID,conn)
 }
-func (this *Lister) closeConn(conn net.Conn,err error){
+func (this *Listener) closeConn(conn net.Conn,err error){
 	defer func(){
 		conn.Close()
 	}()

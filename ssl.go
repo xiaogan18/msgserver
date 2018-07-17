@@ -12,7 +12,7 @@ import(
 var(
 	privateKey *rsa.PrivateKey
 	rsa_privateKey []byte
-	rsa_publicKey []byte
+	rsa_publicKey string
 	secretKey []byte
 )
 func init(){
@@ -22,8 +22,9 @@ func init(){
 		panic("failed to create rsa secret key!")
 	}
 	rsa_privateKey= x509.MarshalPKCS1PrivateKey(privateKey)
-	rsa_publicKey= x509.MarshalPKCS1PublicKey(&privateKey.PublicKey)
-	//用当前时间sha256生成一个秘钥
+	rsa_publicKey= fmt.Sprintf("%x", x509.MarshalPKCS1PublicKey(&privateKey.PublicKey))
+	
+	//用当前时间sha256生成一个AES秘钥
 	now:=time.Now().Unix()
 	hash:=sha256.Sum256([]byte(fmt.Sprintf("%d",now)))
 	secretKey=hash[:16]
@@ -31,7 +32,7 @@ func init(){
 // 开始三次握手
 func handshake(conn net.Conn) error{
 	// 发送公钥
-	if _,err:=conn.Write(rsa_publicKey);err!=nil{
+	if _,err:=conn.Write([]byte(rsa_publicKey));err!=nil{
 		return err
 	}
 	// 接收客户端密文

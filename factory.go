@@ -6,11 +6,11 @@ import(
 	"msgserver/queue"
 )
 
-func NewDefaultServer() (sder *SenderScheduler,lster *Lister,err error){
-	return NewServer("default","default","default","default",false)
+func NewDefaultServer() (sder *SenderScheduler,lster *Listener,err error){
+	return NewServer("default","default","default","default",true)
 }
 
-func NewServer(poolType,queueType,serializer,protocolType string,OnSSL bool) (sder *SenderScheduler,lster *Lister,err error){
+func NewServer(poolType,queueType,serializer,protocolType string,OnSSL bool) (sder *SenderScheduler,lster *Listener,err error){
 	defer func(){
 		if e:=recover();e!=nil{
 			sder=nil
