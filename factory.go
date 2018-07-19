@@ -1,13 +1,14 @@
 package msgserver
 import(
-	"msgserver/pool"
-	"msgserver/serialize"
-	"msgserver/protocol"
-	"msgserver/queue"
+	"github.com/xiaogan18/msgserver/pool"
+	"github.com/xiaogan18/msgserver/serialize"
+	"github.com/xiaogan18/msgserver/protocol"
+	"github.com/xiaogan18/msgserver/queue"
+	"fmt"
 )
-
-func NewDefaultServer() (sder *SenderScheduler,lster *Listener,err error){
-	return NewServer("default","default","default","default",true)
+// 使用默认参数创建listener/sender
+func NewDefaultServer(onSSL bool) (sder *SenderScheduler,lster *Listener,err error){
+	return NewServer("default","default","default","default",onSSL)
 }
 
 func NewServer(poolType,queueType,serializer,protocolType string,OnSSL bool) (sder *SenderScheduler,lster *Listener,err error){
@@ -15,7 +16,7 @@ func NewServer(poolType,queueType,serializer,protocolType string,OnSSL bool) (sd
 		if e:=recover();e!=nil{
 			sder=nil
 			lster=nil
-			err=e.(error)
+			err=fmt.Errorf("create msg server error:%s",e)
 		}
 	}()
 	pl:=pool.CreatePool(poolType)

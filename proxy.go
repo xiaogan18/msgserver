@@ -1,8 +1,8 @@
 package msgserver
 import(
 	"net"
-	"msgserver/protocol"
-	"msgserver/serialize"
+	"github.com/xiaogan18/msgserver/protocol"
+	"github.com/xiaogan18/msgserver/serialize"
 )
 type TcpProxy struct{
 	Proto protocol.Protocol
@@ -14,7 +14,7 @@ func(this *TcpProxy) Write(conn net.Conn,data interface{}) (int,error){
 	var err error
 	var b []byte
 	if b,err=this.Seri.ToBytes(data);err==nil{
-		if this.IsOnSSL{
+		if this.IsOnSSL{  //是否开启SSL加密传输
 			if b,err=Encrypt(b);err==nil{
 				b=this.Proto.Packet(b)
 			}
@@ -33,7 +33,18 @@ func(this *TcpProxy) Read(conn net.Conn) (chan []byte,error){
 	if i,err=conn.Read(b);err==nil{
 		b=b[:i]
 		rdChan:=make(chan []byte)
-		this.Proto.Unpack(b,rdChan)
+		if this.IsOnSSL{   //是否开启SSL加密传输
+			format:=func(data []byte) []byte{
+				if r,err:=Decrypt(data);err!=nil{
+					return nil
+				}else{
+					return r
+				}
+			}
+			this.Proto.Unpack(b,rdChan,format)
+		}else{
+			this.Proto.Unpack(b,rdChan,nil)
+		}
 		return rdChan,nil
 	}
 	return nil,err

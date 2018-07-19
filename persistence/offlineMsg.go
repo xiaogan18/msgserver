@@ -1,7 +1,7 @@
 package persistence
 import(
 	"time"
-	"msgserver/queue"
+	"github.com/xiaogan18/msgserver/queue"
 )
 
 type MsgContainer interface{

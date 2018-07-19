@@ -7,7 +7,7 @@ import(
 	"strings"
 	"net"
 	"errors"
-	"msgserver/persistence"
+	"github.com/xiaogan18/msgserver/persistence"
 )
 type testFilter struct{
 }
@@ -16,7 +16,7 @@ func (this testFilter) OnFilter(conn net.Conn) bool{
 	return true
 }
 func main(){
-	sdr,lster,err:=msgserver.NewDefaultServer()
+	sdr,lster,err:=msgserver.NewDefaultServer(false)
 	if err!=nil{
 		fmt.Println(err)
 	}
@@ -34,7 +34,7 @@ func main(){
 	}
 	//开启一个协程 监听主机3366端口
 	go func(){
-		lster.Listen("192.168.98.32:3366")
+		lster.Listen("127.0.0.1:3366")
 	}()
 	// 开启协程 监听主机3365端口
 	go func(){

@@ -8,7 +8,7 @@ type Protocol interface{
 	// 封包
 	Packet(msg []byte) []byte
 	// 解包
-	Unpack(buffer []byte,readChan chan []byte)
+	Unpack(buffer []byte,readChan chan []byte,formatting func([]byte) []byte)
 }
 func CreatePro(t string)(p Protocol){
 	switch(t){
@@ -28,7 +28,7 @@ const(
 func(this *CustomPro) Packet(msg []byte) []byte{
 	return append(msg,byte(proSplitChar))
 }
-func(this *CustomPro) Unpack(buffer []byte,readChan chan []byte){
+func(this *CustomPro) Unpack(buffer []byte,readChan chan []byte,formatting func([]byte) []byte){
 	go func(){
 		startIndex:=0
 		chars:=bytes.Runes(buffer)
@@ -41,7 +41,11 @@ func(this *CustomPro) Unpack(buffer []byte,readChan chan []byte){
 		if startIndex >= len(buffer){
 			readChan<-[]byte{}
 		}else{
-			readChan<-buffer[startIndex:]
+			if formatting!=nil{
+				readChan<-formatting(buffer[startIndex:])
+			}else{
+				readChan<-buffer[startIndex:]
+			}
 		}
 	}()
 }

@@ -1,7 +1,7 @@
 package msgserver
 import(
-	"msgserver/queue"
-	"msgserver/pool"
+	"github.com/xiaogan18/msgserver/queue"
+	"github.com/xiaogan18/msgserver/pool"
 	"sync"
 	"time"
 	"errors"

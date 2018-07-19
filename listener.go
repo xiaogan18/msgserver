@@ -2,7 +2,7 @@ package msgserver
 import(
 	"net"
 	"fmt"
-	"msgserver/pool"
+	"github.com/xiaogan18/msgserver/pool"
 )
 type Listener struct{
 	net.Listener
@@ -24,10 +24,10 @@ func NewListener(pool pool.Pool,proxy *TcpProxy) *Listener{
 	return this
 }
 // 开启监听（阻塞）
-func(this *Listener) Listen(address string) error{
+func(this *Listener) Listen(address string){
 	lster,err:=net.Listen("tcp",address)
 	if(err!=nil){
-		return err
+		panic(err)
 	}
 	fmt.Printf("listen address %s ...\n",address)
 	for{

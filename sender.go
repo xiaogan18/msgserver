@@ -1,8 +1,8 @@
 package msgserver
 import(
-	"msgserver/queue"
-	"msgserver/pool"
-	"msgserver/persistence"
+	"github.com/xiaogan18/msgserver/queue"
+	"github.com/xiaogan18/msgserver/pool"
+	"github.com/xiaogan18/msgserver/persistence"
 	"time"
 	"fmt"
 )
