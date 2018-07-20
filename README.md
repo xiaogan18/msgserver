@@ -52,7 +52,7 @@ func main(){
 ### 带参数构建服务
 ```go
 //函数签名
-func NewServer(poolType,queueType,serializer,protocolType string,OnSSL bool) (sder *SenderScheduler,lster *Listener,err error)
+func NewServer(poolType,queueType,serializer,protocolType string,OnSSL bool) (*SenderScheduler,*Listener,error)
 ```
 	poolType:连接池类型（默认'default'）
 	queueType:队列类型（默认'default'）
@@ -88,20 +88,20 @@ lster.Filter=new(testFilter)
 	如果你需要验证客户端的身份，可以定义身份验证函数。
 	其中string参数是建立连接后客户端发送来的一段字符串,验证失败服务端会主动断开连接
 ```go
-	lster.OnAuthentication=func(data string) (string,error){
-		user:=strings.Split(data,";")
-		if len(user)==2 && user[1]=="123456"{
-			return user[0],nil
-		}else{
-			return "",errors.New("password is wrong")
-		}
+lster.OnAuthentication=func(data string) (string,error){
+	user:=strings.Split(data,";")
+	if len(user)==2 && user[1]=="123456"{
+		return user[0],nil
+	}else{
+		return "",errors.New("password is wrong")
 	}
+}
 ```
 ### 离线消息持久化
 	如果你需要保存用户离线后的消息，可以使用持久化器。
 	用户下次上线后会立即取出消息发送（只会对调用Sender.SendMessage()的消息进行持久化）
 ```go
-	sdr.Container=persistence.CreateMsgContainer("default")  //参数是持久化容器类型（memory/redis，默认是memory）
+sdr.Container=persistence.CreateMsgContainer("default")  //参数是持久化容器类型（memory/redis，默认是memory）
 ```
 ### HTTP API接口调用
 	如果你想通过http来控制消息发送，可以使用api监听
@@ -131,10 +131,10 @@ sdr.QueueBufferLen=1000
 ### 开始服务
 	如果你完成了所有配置，就可以按下面的方式开始服务了
 ```go
-	//listener开始监听
-	go func(){
-		lster.Listen("127.0.0.1:3366")
-	}()
-	// 开始sender
-	sdr.BeginSender()
+//listener开始监听
+go func(){
+	lster.Listen("127.0.0.1:3366")
+}()
+// 开始sender
+sdr.BeginSender()
 ```
