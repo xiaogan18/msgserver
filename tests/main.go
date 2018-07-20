@@ -1,6 +1,6 @@
 package main
 import(
-	"msgserver"
+	"github.com/xiaogan18/msgserver"
 	"bufio"
 	"os"
 	"fmt"
@@ -56,6 +56,7 @@ func main(){
 	sdr.BeginSender()
 	for{
 		// 从标准输入读取字符串，以\n为分割
+		fmt.Print("input a msg")
 		text, err := bufio.NewReader(os.Stdin).ReadString('\n')
 		if(err==nil){
 			text= strings.Replace(text,"\r\n","",1)
