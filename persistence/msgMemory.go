@@ -1,7 +1,6 @@
 package persistence
 import(
 	"sync"
-	"errors"
 	"time"
 )
 type MemoryContainer struct{
@@ -12,9 +11,7 @@ type MemoryContainer struct{
 	// 存储用户消息关系
 	userMsgMap map[string][]string
 }
-var(
-	NotFoundMsg=errors.New("msg is not found")
-)
+
 
 func(this *MemoryContainer) Get(id string) (*OfflineMsg,error){
 	this._msg_lock.Lock()

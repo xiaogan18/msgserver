@@ -61,7 +61,7 @@ func NewServer(poolType,queueType,serializer,protocolType string,OnSSL bool) (*S
 	OnSSL:是否开启SSL加密
 ```go
 //带参数构建服务实体
-sdr,lster,err:=NewServer("default","default","json","default",true)
+sdr,lster,err:=msgserver.NewServer("default","default","json","default",true)
 ```
 ### SSL握手
 	如果你开启了SSL，建立连接时将触发三次握手密钥交换，且之后的所有消息将使用加密传输。 <br>
@@ -101,7 +101,11 @@ lster.OnAuthentication=func(data string) (string,error){
 	如果你需要保存用户离线后的消息，可以使用持久化器。
 	用户下次上线后会立即取出消息发送（只会对调用Sender.SendMessage()的消息进行持久化）
 ```go
-sdr.Container=persistence.CreateMsgContainer("default")  //参数是持久化容器类型（memory/redis，默认是memory）
+// 保存在内存
+sdr.Container=persistence.CreateMsgContainer("default")  
+// 保存在redis
+sdr.Container=persistence.CreateMsgContainer("redis",
+	&persistence.RedisOptions{Network:"tcp",Address:"127.0.0.1:6379",})
 ```
 ### HTTP API接口调用
 	如果你想通过http来控制消息发送，可以使用api监听
@@ -121,6 +125,10 @@ http post body(To为空表示发送全员通知):
 }
 ### Sender调度器参数
 ```go
+// 消息发送重试次数
+sdr.ResendTimes=2
+// 重试间隔（毫秒）
+sdr.ResendInterval=10*1000
 // 消息发送处理最大并行数设置
 sdr.MaxParallel=10
 //最小并行数设置

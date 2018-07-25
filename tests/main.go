@@ -16,7 +16,7 @@ func (this testFilter) OnFilter(conn net.Conn) bool{
 	return true
 }
 func main(){
-	sdr,lster,err:=msgserver.NewDefaultServer(false)
+	sdr,lster,err:=msgserver.NewDefaultServer(true)
 	if err!=nil{
 		fmt.Println(err)
 	}
@@ -44,8 +44,14 @@ func main(){
 		// 开启http api
 		apier.Listen("127.0.0.1:3365","/msg/sender")
 	}()
+	// 消息发送重试次数
+	sdr.ResendTimes=2
+	// 重试间隔（毫秒）
+	sdr.ResendInterval=10*1000
 	// 设置离线消息容器
-	sdr.Container=persistence.CreateMsgContainer("default")
+	sdr.Container=persistence.CreateMsgContainer("default")  
+	//sdr.Container=persistence.CreateMsgContainer("redis",
+	//	&persistence.RedisOptions{Network:"tcp",Address:"127.0.0.1:6379",})
 	// 消息发送处理最大并行数设置
 	sdr.MaxParallel=10
 	//最小并行数设置
@@ -56,7 +62,7 @@ func main(){
 	sdr.BeginSender()
 	for{
 		// 从标准输入读取字符串，以\n为分割
-		fmt.Print("input a msg")
+		fmt.Print("input a msg\n")
 		text, err := bufio.NewReader(os.Stdin).ReadString('\n')
 		if(err==nil){
 			text= strings.Replace(text,"\r\n","",1)

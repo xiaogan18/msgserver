@@ -93,6 +93,11 @@ func(this *SenderScheduler) newGoroutine(){
 		this.parallelNum++
 	}
 	go func(this *SenderScheduler){
+		defer func(){
+			if err:=recover();err!=nil{
+				fmt.Println(err)
+			}
+		}()
 		for{
 			m,err:=this.queue.Dequeue()  //取队列消息
 			if err==queue.Error_QueueIsEmpty{

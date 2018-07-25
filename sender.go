@@ -18,7 +18,7 @@ type Sender struct{
 	FailedCallback func(error)  
 	// 失败重试次数
 	ResendTimes int 
-	// 重试间隔
+	// 重试间隔(毫秒)
 	ResendInterval int 
 }
 // 发送消息
@@ -58,7 +58,7 @@ func(this *Sender) UpOnline(userID string){
 	}
 }
 
-
+// conn write
 func(this *Sender) send(msg *queue.Message) error{
 	msg.TrySendTimes++
 	msg.SendTime=time.Now()

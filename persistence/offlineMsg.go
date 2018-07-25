@@ -2,8 +2,12 @@ package persistence
 import(
 	"time"
 	"github.com/xiaogan18/msgserver/queue"
+	"github.com/xiaogan18/msgserver/serialize"
+	"errors"
 )
-
+var(
+	NotFoundMsg=errors.New("msg is not found")
+)
 type MsgContainer interface{
 	Get(id string) (*OfflineMsg,error)
 	GetUserMsg(userID string) ([]*OfflineMsg,error)
@@ -14,8 +18,16 @@ type OfflineMsg struct{
 	KeepLiveTime time.Time
 }
 
-func CreateMsgContainer(t string) MsgContainer{
+func CreateMsgContainer(t string,params ...interface{}) MsgContainer{
 	switch(t){
+	case "redis":
+		p:=params[0].(*RedisOptions)
+		c:=RedisContainer{
+			serializer:serialize.CreateSerializer("json"),
+			option:p,
+		}
+		c.try()
+		return &c
 	default:
 		c:=MemoryContainer{
 			msgMap:make(map[string]*OfflineMsg,0),
