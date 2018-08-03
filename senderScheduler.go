@@ -102,14 +102,15 @@ func(this *SenderScheduler) newGoroutine(){
 			m,err:=this.queue.Dequeue()  //取队列消息
 			if err==queue.Error_QueueIsEmpty{
 				this.Lock()
+				b:=this.parallelNum<=this.MinParallel
+				this.Unlock()
 				//判断协程结束或阻塞
-				if this.parallelNum<=this.MinParallel{
+				if b{
 					//已达到最小并行数量，休眠
 					time.Sleep(time.Second*1)
 				}else{
 					break
 				}
-				this.Unlock()
 			}else if err==nil{
 				//fmt.Println(*m)
 				this.task(m)
